@@ -11,9 +11,9 @@ Details can be found in the `install.sh` script.
 ## Usage
 
 1. Install **minimal** Arch Linux from USB with the `archinstall` script.  
-  1A. Access wifi with: `iwctl station wlan0 connect <network_name>` or with the install script.  
+  1A. Access wifi before with: `iwctl station wlan0 connect <network_name>` or with the install script.  
   1B. Make sure to select `NetworkManager` as wifi for new system.  
-  1C. Add `git` as an added software package.  
+  1C. Ensure `git` is an added software package.  
 2. Reboot into system drive.  
 3. Login to wifi with `nmtui`.  
 4. (Optional) Plugin in USB drive containing large/private files.  
