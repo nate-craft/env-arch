@@ -87,9 +87,11 @@ rsync -a --mkpath --ignore-missing-args /etc/fonts/local.conf ~/Env/etc/fonts/ |
 ) || panic "Could not push changes to remote repository"
  
 # backs up any data stored locally to USB
-# Used for large and private files
+# Used for large + private files and Env backup
 
 if lsblk -o UUID | rg -q "$USB"; then
+    rsync --temp-dir=/tmp -rltD --mkpath --no-links --modify-window=2 --partial --info=progress2 "$ENV" /mnt/drive/
+    
     # Large Files
     rsync --temp-dir=/tmp -rltD --mkpath --no-links --modify-window=2 --partial --info=progress2 "${HOME}/Documents" /mnt/drive/
     rsync --temp-dir=/tmp -rltD --mkpath --no-links --modify-window=2 --partial --info=progress2 "${HOME}/Music" /mnt/drive/
