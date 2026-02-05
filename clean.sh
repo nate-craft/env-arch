@@ -38,7 +38,7 @@ if prompt "Do you want to remove xorg compatibility?"; then
 fi
 
 if prompt "Do you want to hide unused programs from the application launcher?"; then
-	export PATH="$PATH:~/Env/scripts/"
+	export PATH="$PATH:~/.local/bin/"
     hide /usr/share/applications/org.pwmt.zathura.desktop
     hide /usr/share/applications/fish.desktop
     hide /usr/share/applications/bvnc.desktop

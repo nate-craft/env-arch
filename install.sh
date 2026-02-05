@@ -44,7 +44,7 @@ PKG_DRIVER="intel-media-driver"
 PKG_THEME="adw-gtk-theme qt6-wayland qt5-wayland"
 PKG_CLI_BASE="bat ripgrep fd bc tmux jq helix libsixel tealdeer"
 PKG_CLI_EXTRA="bluetui yt-dlp fzf socat shellcheck-bin gurk imagemagick htop markdown-oxide \
-    auditorium yt-feeds"
+    auditorium yt-feeds yazi"
 PKG_GUI="gammastep mpv imv pavucontrol zathura zathura-pdf-poppler \
         librewolf-bin libreoffice-fresh freetube-bin picard calibre"
 
@@ -178,6 +178,7 @@ if prompt "Do you enable local data syncing?"; then
             rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/.librewolf" "$HOME/"
             rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/.ssh" "$HOME/"
             rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/.config/gnupg" "$HOME/.config/"
+            rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/.local/share/gurk" "$HOME/.local/share"
 
             chmod -R 755 "${HOME}/Documents/"
             chmod -R 755 "${HOME}/Music/"
@@ -188,6 +189,7 @@ if prompt "Do you enable local data syncing?"; then
             chmod 644 "$HOME"/.ssh/*.pub
             find "${HOME}/.config/gnupg" -type f -exec chmod 600 {} \;
             find "${HOME}/.config/gnupg" -type d -exec chmod 700 {} \;
+            rm -rf "$HOME/.gnupg"
         else
             msg_err "USB ${USB} not available. Not syncing documents and music from remote drive"    
         fi        
@@ -197,6 +199,7 @@ fi
 # paru
 
 if ! prog_exists paru; then
+    pacman -S --needed rustup
     git clone https://aur.archlinux.org/paru.git
     (
         cd paru || (msg_err "Could not install paru!" && exit 1)
@@ -244,7 +247,7 @@ fi
 
 if prompt "Do you want to install developer utilities, programs, and libraries?"; then
     if prompt "Do you want to install rust components and programs?"; then
-        paru -S --needed rustup rust-analyzer cmake lldb sccache yazi 
+        paru -S --needed rust-analyzer cmake lldb sccache 
     
         export RUSTUP_HOME="$HOME/.local/share/rustup/"
         export CARGO_HOME="$HOME/.local/share/cargo/"
@@ -317,7 +320,7 @@ if prompt "Do you want to install user applications?"; then
 
     if prompt "Do you want to add iCloud photo syncing?"; then
         paru -S --needed icloudpd
-        icloudpd --username --auth-only
+        icloudpd --auth-only
         if prompt "Do you want to sync iCloud photos now?"; then
             icloudpd --skip-live-photos --only-print-filenames --folder-structure none --directory ~/Photos/Cloud/
         fi

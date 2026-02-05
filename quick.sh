@@ -12,7 +12,7 @@ if ! command -v git > /dev/null; then
     sudo pacman -Syu git || panic "Could not install git"
 fi
 
-git clone git@github.com:nate-craft/Environment.git "$ENV" || panic "Could not clone into remote repository"
+git clone git@github.com:nate-craft/env-arch.git "$ENV" || panic "Could not clone into remote repository"
 cd "$ENV" || panic "Could not enter local ${ENV}"
 chmod +x -R *.sh || panic "Could not give permissions ot local scripts"
 ./install.sh 

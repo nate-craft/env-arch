@@ -105,11 +105,15 @@ if lsblk -o UUID | rg -q "$USB"; then
         
     # GPG
     rsync --temp-dir=/tmp -rltD --mkpath --no-links --modify-window=2 --partial --info=progress2 \
-        "${HOME}/.config/gnupg" /mnt/drive/ 
+        "${HOME}/.config/gnupg" /mnt/drive/.config/
 
+    # Signal
+    rsync --temp-dir=/tmp -rltD --mkpath --no-links --modify-window=2 --partial --info=progress2 \
+        "${HOME}/.local/share/gurk" /mnt/drive/.local/share/
+        
     # TOTP        
     rsync --temp-dir=/tmp -rltD --mkpath --no-links --modify-window=2 --partial --info=progress2 \
-        ~/.local/share/cotp /mnt/drive/.local/share
+        ~/.local/share/cotp /mnt/drive/.local/share/
 
     # Bookmarks
     rsync --temp-dir=/tmp -rltD --mkpath --no-links --modify-window=2 --partial --info=progress2 \
