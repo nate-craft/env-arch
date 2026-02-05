@@ -11,7 +11,7 @@ DRIVE="/mnt/drive/"
 DRIVE_PRIVATE="/mnt/drive/private"
 DRIVE_FILES="/mnt/drive/files"
 
-RSYNC_ARGS="-T /tmp -rltD --mkpath --no-links --modify-window=2 --partial --info=progress2"
+RSYNC_ARGS="-T '/tmp' -rltD --mkpath --no-links --modify-window=2 --partial --info=progress2"
 
 conf_to_env() {
     rsync -a --mkpath --ignore-missing-args "${HOME}/.config/${1}" "$ENV_CONF" || panic "Could not sync ${1}"
