@@ -152,9 +152,9 @@ if prompt "Do you enable local data syncing?"; then
     # copy home files from local env files
 
     if prompt "Do you want to install custom configuration and scripts?"; then
-        sudo rsync "$RSYNC_ARGS" "${ENV}/public/etc" "/"
-        rsync "$RSYNC_ARGS" "${ENV}/public/.config" "$HOME"
-        rsync "$RSYNC_ARGS" "${ENV}/public/.local/bin" "$HOME/.local/"
+        sudo rsync $RSYNC_ARGS "${ENV}/public/etc" "/"
+        rsync $RSYNC_ARGS "${ENV}/public/.config" "$HOME"
+        rsync $RSYNC_ARGS "${ENV}/public/.local/bin" "$HOME/.local/"
         chmod +x -R "${HOME}/.local/bin"
         chmod +x -R "${HOME}/.config/waybar/"
     fi
@@ -172,14 +172,14 @@ if prompt "Do you enable local data syncing?"; then
         sudo chown -R "${USER}:${USER}" "$USB_MOUNT_DIR"
 
         if lsblk -o UUID | grep -q "$USB"; then
-            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/files/Documents" "$HOME"
-            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/files/Music" "$HOME"
-            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/files/Photos" "$HOME"
-            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/private/.local/share" "$HOME/.local/"
-            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/private/.librewolf" "$HOME/"
-            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/private/.ssh" "$HOME/"
-            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/private/.config/gnupg" "$HOME/.config/"
-            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/private/.local/share/gurk" "$HOME/.local/share"
+            rsync $RSYNC_ARGS "${USB_MOUNT_DIR}/files/Documents" "$HOME"
+            rsync $RSYNC_ARGS "${USB_MOUNT_DIR}/files/Music" "$HOME"
+            rsync $RSYNC_ARGS "${USB_MOUNT_DIR}/files/Photos" "$HOME"
+            rsync $RSYNC_ARGS "${USB_MOUNT_DIR}/private/.local/share" "$HOME/.local/"
+            rsync $RSYNC_ARGS "${USB_MOUNT_DIR}/private/.librewolf" "$HOME/"
+            rsync $RSYNC_ARGS "${USB_MOUNT_DIR}/private/.ssh" "$HOME/"
+            rsync $RSYNC_ARGS "${USB_MOUNT_DIR}/private/.config/gnupg" "$HOME/.config/"
+            rsync $RSYNC_ARGS "${USB_MOUNT_DIR}/private/.local/share/gurk" "$HOME/.local/share"
 
             chmod -R 755 "${HOME}/Documents/"
             chmod -R 755 "${HOME}/Music/"
