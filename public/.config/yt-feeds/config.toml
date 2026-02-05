@@ -1,0 +1,4 @@
+videos_per_channel = 60
+videos_per_search = 60
+saved_video_path = "/home/nate/Videos/"
+refresh_on_start = false

@@ -33,6 +33,7 @@ ENV="${HOME}/${ENV_DIR_NAME}"
 USB="DC95-5829"
 USB_MOUNT_DIR="/mnt/drive"
 USB_OPTIONS="exfat defaults,uid=1000,gid=1000,nosuid,nodev,nofail,x-systemd.automount 0 0"
+RSYNC_ARGS="-a --mkpath --partial --ignore-missing-args --info=progress2"
 
 # packages 
 
@@ -42,11 +43,11 @@ PKG_SWAY="sway swayidle swaylock waybar polkit foot \
           7zip bluez"
 PKG_DRIVER="intel-media-driver"
 PKG_THEME="adw-gtk-theme qt6-wayland qt5-wayland"
-PKG_CLI_BASE="bat ripgrep fd bc tmux jq helix libsixel tealdeer"
-PKG_CLI_EXTRA="bluetui yt-dlp fzf socat shellcheck-bin gurk imagemagick htop markdown-oxide \
-    auditorium yt-feeds yazi"
+PKG_CLI_BASE="bat ripgrep fd bc tmux jq helix libsixel tealdeer man"
+PKG_CLI_EXTRA="bluetui yt-dlp fzf socat shellcheck-bin gurk imagemagick
+               htop markdown-oxide auditorium yt-feeds yazi"
 PKG_GUI="gammastep mpv imv pavucontrol zathura zathura-pdf-poppler \
-        librewolf-bin libreoffice-fresh freetube-bin picard calibre"
+         librewolf-bin libreoffice-fresh freetube-bin picard calibre"
 
 #------------------------------------------------------------------
 #                          SCRIPT START
@@ -150,10 +151,10 @@ if prompt "Do you enable local data syncing?"; then
 
     # copy home files from local env files
 
-    if prompt "Do you want to install '\$HOME' and '/etc/' configuration and scripts?"; then
-        sudo rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${ENV}/etc" "/"
-        rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${ENV}/.config" "$HOME"
-        rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${ENV}/.local/bin" "$HOME/.local/"
+    if prompt "Do you want to install custom configuration and scripts?"; then
+        sudo rsync "$RSYNC_ARGS" "${ENV}/public/etc" "/"
+        rsync "$RSYNC_ARGS" "${ENV}/public/.config" "$HOME"
+        rsync "$RSYNC_ARGS" "${ENV}/public/.local/bin" "$HOME/.local/"
         chmod +x -R "${HOME}/.local/bin"
         chmod +x -R "${HOME}/.config/waybar/"
     fi
@@ -171,14 +172,14 @@ if prompt "Do you enable local data syncing?"; then
         sudo chown -R "${USER}:${USER}" "$USB_MOUNT_DIR"
 
         if lsblk -o UUID | grep -q "$USB"; then
-            rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/Documents" "$HOME"
-            rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/Music" "$HOME"
-            rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/Photos" "$HOME"
-            rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/.local/share" "$HOME/.local/"
-            rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/.librewolf" "$HOME/"
-            rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/.ssh" "$HOME/"
-            rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/.config/gnupg" "$HOME/.config/"
-            rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/.local/share/gurk" "$HOME/.local/share"
+            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/files/Documents" "$HOME"
+            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/files/Music" "$HOME"
+            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/files/Photos" "$HOME"
+            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/private/.local/share" "$HOME/.local/"
+            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/private/.librewolf" "$HOME/"
+            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/private/.ssh" "$HOME/"
+            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/private/.config/gnupg" "$HOME/.config/"
+            rsync "$RSYNC_ARGS" "${USB_MOUNT_DIR}/private/.local/share/gurk" "$HOME/.local/share"
 
             chmod -R 755 "${HOME}/Documents/"
             chmod -R 755 "${HOME}/Music/"

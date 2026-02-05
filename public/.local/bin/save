@@ -1,0 +1,136 @@
+#!/usr/bin/env sh
+
+USB="DC95-5829"
+REPO="git@github.com:nate-craft/env-arch.git"
+
+ENV="${HOME}/Env"
+ENV_PUBLIC="${ENV}/public"
+ENV_CONF="${ENV_PUBLIC}/.config/"
+ENV_LOCAL="${ENV_PUBLIC}/.local/"
+DRIVE="/mnt/drive/"
+DRIVE_PRIVATE="/mnt/drive/private"
+DRIVE_FILES="/mnt/drive/files"
+
+RSYNC_ARGS="--temp-dir=/tmp -rltD --mkpath --no-links --modify-window=2 --partial --info=progress2"
+
+conf_to_env() {
+    rsync -a --mkpath --ignore-missing-args "${HOME}/.config/${1}" "$ENV_CONF" || panic "Could not sync ${1}"
+}
+
+msg_err() {    
+    printf "%s%s%s\n" "$(tput setaf 1)" "$@" "$(tput sgr0)"
+}
+
+panic() {
+    msg_err "$@"
+    exit 1
+}
+
+if [ ! -d "$ENV" ]; then
+    printf "Cloning into Environment remote repository\n"
+    git clone "$REPO" "$ENV" || panic "Could not clone into repository"
+else
+    cd "$ENV" || panic "Could not move into ${ENV}"
+    printf "Updating local repository\n"
+    git pull origin main || panic "Could not update local '$ENV' directory from remote repository"
+fi
+
+rsync -a --mkpath --ignore-missing-args "${HOME}/.local/bin" "$ENV_LOCAL" || panic "Could not sync ${HOME}/.local/bin"
+
+conf_to_env "mimeapps.list"
+conf_to_env "electron-flags.conf"
+conf_to_env "tmux"
+conf_to_env "helix"
+conf_to_env "foot"
+conf_to_env "yazi"
+conf_to_env "fish"
+conf_to_env "yt-dlp"
+conf_to_env "yt-feeds"
+conf_to_env "auditorium"
+conf_to_env "mpv"
+conf_to_env "sway"
+conf_to_env "waybar"
+conf_to_env "rofi"
+conf_to_env "dunst"
+conf_to_env "gammastep"
+
+rsync -a --mkpath --ignore-missing-args "${HOME}/.config/FreeTube" \
+    --exclude "Cache/" \
+    --exclude "**/LOG" \
+    --exclude "**/LOG.old" \
+    --exclude "blob_storage" \
+    --exclude "SingletonSocket" \
+    --exclude "SingletonCookie" \
+    --exclude "SingletonLock" \
+    --exclude "Network Persistent State" \
+    --exclude "subscription-cache.db" \
+    --exclude "DawnGraphiteCache" \
+    --exclude "DawnWebGPUCache" \
+    --exclude "GPUCache" \
+    --exclude "Code Cache" \
+    --exclude "player_cache" \
+    "$ENV_CONF" || panic "Could not sync ${HOME}/.config/FreeTube"
+
+rsync -a --mkpath --ignore-missing-args "${HOME}/.config/calibre" \
+    --exclude "viewer-webengine.json" \
+    --exclude "dynamic.pickle.json" \
+    --exclude "global.py.json" \
+    --exclude "gui.json" \
+    "$ENV_CONF" || panic "Could not sync ${HOME}/.config/calibre"
+
+# system files to env
+
+rsync -a --mkpath --ignore-missing-args /etc/fonts "${ENV_PUBLIC}/etc/" || panic "Could not sync /etc/fonts/"
+
+# backs up any data stored locally to Github
+
+(
+    cd "$ENV"
+    git add .
+    git commit -m "$(date --rfc-3339 s)"
+    git remote set-url origin "$REPO"
+    git push --force origin main
+) || panic "Could not push changes to remote repository"
+ 
+# backs up any data stored locally to USB
+# Used for large + private files and Env backup
+
+if lsblk -o UUID | rg -q "$USB"; then    
+    # Large Files
+    rsync "$RSYNC_ARGS" "${HOME}/Documents" "${DRIVE_FILES}/"
+    rsync "$RSYNC_ARGS" "${HOME}/Music" "${DRIVE_FILES}/"
+    rsync "$RSYNC_ARGS" "${HOME}/Photos" "${DRIVE_FILES}/"
+
+    # Env
+    rsync "$RSYNC_ARGS" "$ENV" "$DRIVE" --exclude ".git/"
+
+    # SSH
+    rsync "$RSYNC_ARGS" "${HOME}/.ssh" "${DRIVE_PRIVATE}/"
+        
+    # GPG
+    rsync "$RSYNC_ARGS" "${HOME}/.config/gnupg" "${DRIVE_PRIVATE}/.config/"
+
+    # Signal
+    rsync "$RSYNC_ARGS" "${HOME}/.local/share/gurk" "${DRIVE_PRIVATE}/.local/share/"
+        
+    # TOTP        
+    rsync "$RSYNC_ARGS" "${HOME}/.local/share/cotp" "${DRIVE_PRIVATE}/.local/share/"
+
+    # Bookmarks
+    rsync "$RSYNC_ARGS" "${HOME}/.local/share/dashi" "${DRIVE_PRIVATE}/.local/share/"
+
+    # Librewolf
+    rsync "$RSYNC_ARGS" "${HOME}/.librewolf" "${DRIVE_PRIVATE}/" --exclude "**/lock"
+else
+    msg_err "USB ${USB} not available. Not backing up to external drive..."    
+fi
+
+if [ "$1" = "--clean" ]; then
+    rm -rf "$ENV" || panic "Failed to clean local repository"
+    printf "Cleaned up local directory\n"
+else
+    printf "Synced remote repository. Use 'save --clean' to clean local directories when syncing\n"
+fi
+
+
+

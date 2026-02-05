@@ -1,0 +1,27 @@
+# This file contains fish universal variable definitions.
+# VERSION: 3.0
+SETUVAR --export BROWSER:librewolf
+SETUVAR --export CARGO_HOME:/home/nate/\x2elocal/share/cargo
+SETUVAR --export --path COTP_DB_PATH:/home/nate/\x2elocal/share/cotp/db\x2ecotp
+SETUVAR --export EDITOR:helix
+SETUVAR --export ELECTRON_OZONE_PLATFORM_HINT:wayland
+SETUVAR --export GNUPGHOME:/home/nate/\x2econfig/gnupg
+SETUVAR --export JAVA_HOME:/usr/lib/jvm/java\x2d24\x2dopenjdk
+SETUVAR --export MYVIMRC:/home/nate/\x2econfig/nvim/init\x2elua
+SETUVAR --export PAGER:bat\x20\x2d\x2dpaging\x3dalways
+SETUVAR --export PASSWORD_STORE_DIR:/home/nate/\x2econfig
+SETUVAR --export --path PATH:/usr/local/sbin\x1e/usr/local/bin\x1e/usr/bin\x1e/usr/bin/site_perl\x1e/usr/bin/vendor_perl\x1e/usr/bin/core_perl\x1e/usr/lib/jvm/java\x2d24\x2dopenjdk/bin/
+SETUVAR --export PKIHOME:/home/nate/\x2econfig/pki
+SETUVAR --export RUSTC_WRAPPER:sccache
+SETUVAR --export RUSTUP_HOME:/home/nate/\x2elocal/share/rustup
+SETUVAR --export SHELL:fish
+SETUVAR --export TERMINAL:foot
+SETUVAR --export TMUX_CONF:/home/nate/\x2econfig/tmux/tmux\x2econf
+SETUVAR --export XDG_CONFIG_HOME:/home/nate/\x2econfig
+SETUVAR --export XDG_CURRENT_DESKTOP:sway
+SETUVAR --export XDG_DATA_HOME:/home/nate/\x2elocal/share
+SETUVAR --export XDG_MUSIC_DIR:/home/nate/Music
+SETUVAR --export ZDOTDIR:/home/nate/\x2econfig/zsh
+SETUVAR --export _JAVA_AWT_WM_NONREPARENTING:1
+SETUVAR __fish_initialized:4300
+SETUVAR --export visual:helix

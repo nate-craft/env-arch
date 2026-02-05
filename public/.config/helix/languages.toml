@@ -1,0 +1,25 @@
+# [language-server]
+# clangd = { command = "clangd", args = [ "--clang-tidy" ] }
+
+[[language]]
+name = "c"
+file-types = ["c", "h"]
+indent = { tab-width = 4, unit = "    " }
+auto-format = true
+soft-wrap.enable = false
+
+[[language]]
+name = "bash"
+file-types = ["sh"]
+indent = { tab-width = 4, unit = "    " }
+
+[[language]]
+name = "rust"
+formatter = { command = "rustfmt" }
+language-servers = [ { name = "rust-analyzer" } ]
+auto-format = true
+
+[language-server.rust-analyzer]
+command = "rust-analyzer"
+config = { checkOnSave = true, cargo = { allFeatures = true, loadOutDirsFromCheck = true, runBuildScripts = true }, diagnostics = { disabled = [ "inactive-code" ] } }
+
