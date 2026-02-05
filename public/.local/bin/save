@@ -79,7 +79,7 @@ rsync -a --mkpath --ignore-missing-args "${HOME}/.config/calibre" \
 
 # system files to env
 
-rsync -a --mkpath --ignore-missing-args /etc/fonts "${ENV_PUBLIC}/etc/" || panic "Could not sync /etc/fonts/"
+rsync -a --mkpath --ignore-missing-args /etc/fonts "${ENV_PUBLIC}/etc/" --exclude "conf.d" || panic "Could not sync /etc/fonts/"
 
 # backs up any data stored locally to Github
 
