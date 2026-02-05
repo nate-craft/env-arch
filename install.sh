@@ -104,7 +104,7 @@ fi
 # sway
 
 if ! prog_exists sway; then
-    sudo pacman -S --needed $PKG_DRIVER $PKG_SWAY $PKG_CLI
+    sudo pacman -S --needed $PKG_DRIVER $PKG_SWAY $PKG_CLI_BASE
 fi
 
 # git
@@ -177,6 +177,7 @@ if prompt "Do you enable local data syncing?"; then
             rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/.local/share" "$HOME/.local/"
             rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/.librewolf" "$HOME/"
             rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/.ssh" "$HOME/"
+            rsync -a --mkpath --partial --ignore-missing-args --info=progress2 "${USB_MOUNT_DIR}/.config/gnupg" "$HOME/.config/"
 
             chmod -R 755 "${HOME}/Documents/"
             chmod -R 755 "${HOME}/Music/"

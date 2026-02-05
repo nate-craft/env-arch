@@ -11,13 +11,13 @@ Details can be found in the `install.sh` script.
 ## Usage
 
 1. Install **minimal** Arch Linux from USB with the `archinstall` script.  
-  1A. Access wifi with: `iwctl station wlan0 connect <network_name>` or with the install script.
-  1B. Make sure to select `NetworkManager` as wifi for new system .
-  1C. Add `git` as an added software package.
-2. Reboot into system drive.
-3. Login to wifi with `nmtui`.
-4. (Optional) Plugin in USB drive containing large/private files.
-5. `curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/nate-craft/Environment/refs/heads/main/quick.sh | sh`
+  1A. Access wifi with: `iwctl station wlan0 connect <network_name>` or with the install script.  
+  1B. Make sure to select `NetworkManager` as wifi for new system.  
+  1C. Add `git` as an added software package.  
+2. Reboot into system drive.  
+3. Login to wifi with `nmtui`.  
+4. (Optional) Plugin in USB drive containing large/private files.  
+5. `curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/nate-craft/env-arch/refs/heads/main/quick.sh | sh`  
 
 ## Keymap
 
