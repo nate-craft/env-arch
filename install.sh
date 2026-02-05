@@ -91,6 +91,11 @@ msg "This script will need to prompt for super user permissions to install progr
 msg "Pacman will now sync packages to avoid future dependency issues..."
 sudo pacman -Syu
 
+# env
+
+export RUSTUP_HOME="$HOME/.local/share/rustup/"
+export CARGO_HOME="$HOME/.local/share/cargo/"
+
 # base
 
 if ! prog_exists git || ! prog_exists ssh || ! prog_exists rsync; then
@@ -248,11 +253,7 @@ fi
 
 if prompt "Do you want to install developer utilities, programs, and libraries?"; then
     if prompt "Do you want to install rust components and programs?"; then
-        paru -S --needed rust-analyzer cmake lldb sccache 
-    
-        export RUSTUP_HOME="$HOME/.local/share/rustup/"
-        export CARGO_HOME="$HOME/.local/share/cargo/"
-
+        paru -S --needed rust-analyzer cmake lldb sccache
         rustup default stable
         rustup component add rustfmt
     fi
