@@ -84,3 +84,8 @@ help_content() {
     args="$@"
     printf "%s%s%s\n" "$YELLOW" "$args" "$RESET"  
 }
+
+panic() {
+    msg_err "$@"
+    exit 1
+}

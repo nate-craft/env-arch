@@ -1,30 +1,38 @@
 #!/usr/bin/env sh
 
+. globals
+
+#-----------------------------------------------------------------#
+#                       Variables [Modify]                        #
+# ----------------------------------------------------------------#
+
 USB="DC95-5829"
 REPO="git@github.com:nate-craft/env-arch.git"
-
 ENV="${HOME}/Env"
+DRIVE="/mnt/drive"
+
+#-----------------------------------------------------------------#
+#                    Variables [No Modify]                        #
+# ----------------------------------------------------------------#
+
 ENV_PUBLIC="${ENV}/public"
 ENV_CONF="${ENV_PUBLIC}/.config/"
 ENV_LOCAL="${ENV_PUBLIC}/.local/"
-DRIVE="/mnt/drive/"
-DRIVE_PRIVATE="/mnt/drive/private"
-DRIVE_FILES="/mnt/drive/files"
-
+DRIVE_PRIVATE="${DRIVE}/private"
+DRIVE_FILES="${DRIVE}/files"
 RSYNC_ARGS="-T /tmp -rltD --mkpath --no-links --modify-window=2 --partial --info=progress2"
+
+#-----------------------------------------------------------------#
+#                            Functions                            #
+# ----------------------------------------------------------------#
 
 conf_to_env() {
     rsync -a --mkpath --ignore-missing-args "${HOME}/.config/${1}" "$ENV_CONF" || panic "Could not sync ${1}"
 }
 
-msg_err() {    
-    printf "%s%s%s\n" "$(tput setaf 1)" "$@" "$(tput sgr0)"
-}
-
-panic() {
-    msg_err "$@"
-    exit 1
-}
+#-----------------------------------------------------------------#
+#                            Repo Sync                            #
+# ----------------------------------------------------------------#
 
 if [ ! -d "$ENV" ]; then
     printf "Cloning into Environment remote repository\n"
@@ -34,6 +42,10 @@ else
     printf "Updating local repository\n"
     git pull origin main || panic "Could not update local '$ENV' directory from remote repository"
 fi
+
+#-----------------------------------------------------------------#
+#                            Public Files                         #
+# ----------------------------------------------------------------#
 
 rsync -a --mkpath --ignore-missing-args "${HOME}/.local/bin" "$ENV_LOCAL" || panic "Could not sync ${HOME}/.local/bin"
 
@@ -77,11 +89,12 @@ rsync -a --mkpath --ignore-missing-args "${HOME}/.config/calibre" \
     --exclude "gui.json" \
     "$ENV_CONF" || panic "Could not sync ${HOME}/.config/calibre"
 
-# system files to env
 
 rsync $RSYNC_ARGS /etc/fonts "${ENV_PUBLIC}/etc/" --exclude "conf.d" || panic "Could not sync /etc/fonts/"
 
-# backs up any data stored locally to Github
+#-----------------------------------------------------------------#
+#                        GITHUB SYNCING [Public]                  #
+# ----------------------------------------------------------------#
 
 (
     cd "$ENV"
@@ -91,8 +104,9 @@ rsync $RSYNC_ARGS /etc/fonts "${ENV_PUBLIC}/etc/" --exclude "conf.d" || panic "C
     git push --force origin main
 ) || panic "Could not push changes to remote repository"
  
-# backs up any data stored locally to USB
-# Used for large + private files and Env backup
+#-----------------------------------------------------------------#
+#                       USB SYNCING [Private]                     #
+# ----------------------------------------------------------------#
 
 if lsblk -o UUID | rg -q "$USB"; then    
     # Large Files
@@ -126,6 +140,10 @@ if lsblk -o UUID | rg -q "$USB"; then
 else
     msg_err "USB ${USB} not available. Not backing up to external drive..."    
 fi
+
+#-----------------------------------------------------------------#
+#                     DELETE LOCAL ENV [Optional]                 #
+# ----------------------------------------------------------------#
 
 if [ "$1" = "--clean" ]; then
     rm -rf "$ENV" || panic "Failed to clean local repository"

@@ -17,23 +17,19 @@
 # to the given $ENV_DIR_NAME. After, an attempt will be made to copy Music, Photos, Documents, and
 # other large directories from the given $USB identifier. This is likely unneeded for non-me people.
 
-
-#------------------------------------------------------------------
-#                          VARIABLES START
-# -----------------------------------------------------------------
-
+#-----------------------------------------------------------------#
+#                          VARIABLES [EDIT]                       #
+# ----------------------------------------------------------------#
 
 # environment options
 
 ENV_DIR_NAME="Env"
-ENV="${HOME}/${ENV_DIR_NAME}"
 
 # file syncing
 
 USB="DC95-5829"
 USB_MOUNT_DIR="/mnt/drive"
 USB_OPTIONS="exfat defaults,uid=1000,gid=1000,nosuid,nodev,nofail,x-systemd.automount 0 0"
-RSYNC_ARGS="-a --mkpath --partial --ignore-missing-args --info=progress2"
 
 # packages 
 
@@ -49,11 +45,13 @@ PKG_CLI_EXTRA="bluetui yt-dlp fzf socat shellcheck-bin gurk imagemagick
 PKG_GUI="gammastep mpv imv pavucontrol zathura zathura-pdf-poppler \
          librewolf-bin libreoffice-fresh freetube-bin picard calibre"
 
-#------------------------------------------------------------------
-#                          SCRIPT START
-# -----------------------------------------------------------------
+#-----------------------------------------------------------------#
+#                       VARIABLES [NO EDIT]                       #
+# ----------------------------------------------------------------#
 
-# variables
+ENV="${HOME}/${ENV_DIR_NAME}"
+
+RSYNC_ARGS="-a --mkpath --partial --ignore-missing-args --info=progress2"
 
 SYSTEMD_DIR="/etc/systemd/system/getty@tty1.service.d/"
 SYSTEMD_FILE="/etc/systemd/system/getty@tty1.service.d/override.conf"
@@ -61,10 +59,15 @@ SYSTEMD_SWAY="[Service]
 ExecStart=
 ExecStart=-/sbin/agetty --autologin ${USER} %I 38400 linux
 "
+
 USB_FSTAB_ENTRY="UUID=${USB} ${USB_MOUNT_DIR} ${USB_OPTIONS}"
 
-if [ -f "globals.sh" ]; then
-    . ./globals.sh
+#-----------------------------------------------------------------#
+#                          SCRIPT START                           #
+# ----------------------------------------------------------------#
+
+if [ -f "public/.local/bin/globals" ]; then
+    . public/.local/bin/globals
 else
     printf "%sScript must be executed from the '${ENV_DIR_NAME}' directory on first run!\n" "$(tput setaf 1)"
     exit 0
@@ -80,30 +83,45 @@ msg "This script will need to prompt for super user permissions to install progr
 msg "Pacman will now sync packages to avoid future dependency issues..."
 sudo pacman -Syu
 
-# env
-
-export RUSTUP_HOME="$HOME/.local/share/rustup/"
-export CARGO_HOME="$HOME/.local/share/cargo/"
-export PATH="${HOME}/.local/bin/:${PATH}"
-
-# base
-
-if ! prog_exists git || ! prog_exists ssh || ! prog_exists rsync; then
-    sudo pacman -S --needed $PKG_BASE
-fi
+#-----------------------------------------------------------------#
+#                          MOVE TO ENV DIR                        #
+# ----------------------------------------------------------------#
 
 if [ "$PWD" != "$ENV" ]; then
     mkdir -p "$ENV"
     rsync -a --mkpath --ignore-missing-args ./ "$ENV"
 fi
 
-# sway
+#-----------------------------------------------------------------#
+#                          INIT ENV SETUP                         #
+# ----------------------------------------------------------------#
+
+# note: full environment setup handled by shell
+#       these variables are solely for installation
+
+export RUSTUP_HOME="$HOME/.local/share/rustup/"
+export CARGO_HOME="$HOME/.local/share/cargo/"
+export PATH="${HOME}/.local/bin/:${PATH}"
+
+#-----------------------------------------------------------------#
+#                            BASE PKGS                            #
+# ----------------------------------------------------------------#
+
+if ! prog_exists git || ! prog_exists ssh || ! prog_exists rsync; then
+    sudo pacman -S --needed $PKG_BASE
+fi
+
+#-----------------------------------------------------------------#
+#                            SWAY PKGS                            #
+# ----------------------------------------------------------------#
 
 if ! prog_exists sway; then
     sudo pacman -S --needed $PKG_DRIVER $PKG_SWAY $PKG_CLI_BASE
 fi
 
-# git
+#-----------------------------------------------------------------#
+#                            GIT CONF                             #
+# ----------------------------------------------------------------#
 
 if prompt "Configure your Git settings?${NEW_LINE}Not needed if this data is synced via backups."; then
     ask "username" "What is your Git username?"
@@ -115,7 +133,9 @@ if prompt "Configure your Git settings?${NEW_LINE}Not needed if this data is syn
     git config --global init.defaultBranch main
 fi
 
-# shell
+#-----------------------------------------------------------------#
+#                            SHELL CONF                           #
+# ----------------------------------------------------------------#
 
 if prompt "Install shell programs?"; then
     if prompt "Install dash as default shell for scripts?"; then
@@ -131,7 +151,9 @@ if prompt "Install shell programs?"; then
     fi
 fi
 
-# security
+#-----------------------------------------------------------------#
+#                          SECURITY                               #
+# ----------------------------------------------------------------#
 
 if prompt "Enable sane security defaults?"; then
     sudo pacman -S --needed ufw
@@ -140,7 +162,9 @@ if prompt "Enable sane security defaults?"; then
     sudo ufw enable
 fi
 
-# local files
+#-----------------------------------------------------------------#
+#                         FILE SYNCING                            #
+# ----------------------------------------------------------------#
 
 if prompt "Local data syncing from thumb drive?"; then
 
@@ -193,7 +217,9 @@ if prompt "Local data syncing from thumb drive?"; then
     fi    
 fi
 
-# paru
+#-----------------------------------------------------------------#
+#                               AUR                               #
+# ----------------------------------------------------------------#
 
 if ! prog_exists paru; then
     pacman -S --needed rustup
@@ -205,11 +231,13 @@ if ! prog_exists paru; then
     rm -rf paru
 fi
 
-# utilities
+#-----------------------------------------------------------------#
+#                         SYSTEM UTILITIES                        #
+# ----------------------------------------------------------------#
 
-if prompt "Install bluetooth, brightness control, printing, and battery management?"; then
+if prompt "Install bluetooth, brightness control, printing, and battery utilities?"; then
 
-    # dashi for utility control
+    # brightness, audio, nightlight, battery status
 
     if ! prog_exists dashi; then
         paru -Syu dashi
@@ -240,7 +268,9 @@ if prompt "Install bluetooth, brightness control, printing, and battery manageme
     fi
 fi
 
-# developer dependencies & utilities
+#-----------------------------------------------------------------#
+#                            DEV ENV                              #
+# ----------------------------------------------------------------#
 
 if prompt "Install developer utilities, editors, and libraries?"; then
     if prompt "Do you want to install rust components and programs?"; then
@@ -268,7 +298,9 @@ if prompt "Install developer utilities, editors, and libraries?"; then
     fi
 fi
  
-# core apps
+#-----------------------------------------------------------------#
+#                            CORE APPS                            #
+# ----------------------------------------------------------------#
 
 if prompt "Install user applications?"; then
     paru -S --needed $PKG_THEME $PKG_CLI_EXTRA $PKG_GUI
@@ -278,12 +310,12 @@ if prompt "Install user applications?"; then
         sudo systemctl start NetworkManager.service
     fi
 
-    if prompt "Do you want to install nerd fonts, chinese iconography, and emojis?"; then
+    if prompt "Install nerd fonts, chinese iconography, and emojis?"; then
         paru -S --needed ttf-jetbrains-mono-nerd noto-fonts-cjk noto-fonts-emoji
         fc-cache -fv
     fi
 
-    if prompt "Do you want to enable screen sharing/recording components?"; then
+    if prompt "Enable screen sharing/recording components?"; then
         paru -S --needed wf-recorder xdg-desktop-portal-gtk
     fi
 
@@ -291,34 +323,38 @@ if prompt "Install user applications?"; then
 		paru -S --needed glfw-wayland-minecraft-cursorfix prismlauncher
 	fi
 
+    if prompt "Do you want to add iCloud photo syncing?"; then
+        paru -S --needed icloudpd
+        icloudpd --auth-only
+        if prompt "Do you want to sync iCloud photos now?"; then
+            icloudpd --skip-live-photos --only-print-filenames --folder-structure none --directory "${HOME}/Photos/Cloud/"
+        fi
+    fi
+
     # source-built applications
 
-    if prompt "Do you want to install mpv usability scripts?"; then
+    if prompt "Install mpv usability scripts?"; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tomasklaen/uosc/HEAD/installers/unix.sh)"
         git clone https://github.com/po5/thumbfast
         (
             cd thumbfast || (msg_err "Could not install thumbfast" && exit 1)
-            mkdir -p ~/.config/mpv/scripts/
-            cp -p thumbfast.lua ~/.config/mpv/scripts/
+            mkdir -p "${HOME}/.config/mpv/scripts/"
+            cp -p thumbfast.lua "${HOME}/.config/mpv/scripts/"
         )
         rm -rf thumbfast
         git clone https://github.com/po5/mpv_sponsorblock
         (
             cd mpv_sponsorblock || (msg_err "Could not install mpv sponsorblock" && exit 1)
-            mkdir -p ~/.config/mpv/scripts/
-            cp -rp sponsorblock.lua sponsorblock_shared/ ~/.config/mpv/scripts/
+            mkdir -p "${HOME}/.config/mpv/scripts/"
+            cp -rp sponsorblock.lua sponsorblock_shared/ "${HOME}/.config/mpv/scripts/"
         )
         rm -rf mpv_sponsorblock
     fi
-
-    if prompt "Do you want to add iCloud photo syncing?"; then
-        paru -S --needed icloudpd
-        icloudpd --auth-only
-        if prompt "Do you want to sync iCloud photos now?"; then
-            icloudpd --skip-live-photos --only-print-filenames --folder-structure none --directory ~/Photos/Cloud/
-        fi
-    fi
 fi
+
+#-----------------------------------------------------------------#
+#                           POST INSTALL                          #
+# ----------------------------------------------------------------#
 
 if prompt "Installation complete. Clean up pre-installed files and programs?"; then
 	./clean.sh

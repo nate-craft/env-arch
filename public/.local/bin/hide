@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-. ~/Env/globals.sh
+. globals
 
 help() {
     printf "\n"

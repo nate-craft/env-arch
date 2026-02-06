@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+. globals
+
 if [ -z "$1" ]; then
     notify-send "Link" "No URL provided!" &
     exit 1

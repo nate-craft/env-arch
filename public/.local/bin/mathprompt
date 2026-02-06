@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-. ~/Env/globals.sh
+. globals
 
 if ! prog_exists rofi; then
     msg_err "Rofi is not installed!"
