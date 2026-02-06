@@ -53,18 +53,7 @@ PKG_GUI="gammastep mpv imv pavucontrol zathura zathura-pdf-poppler \
 #                          SCRIPT START
 # -----------------------------------------------------------------
 
-# rules 
-        
-BLUETOOTH_RULE='polkit.addRule(function(action, subject) {
-    if (action.lookup("unit") == "bluetooth.service" 
-            && subject.isInGroup("wheel") 
-            && (action.lookup("verb") == "start" || action.lookup("verb") == "stop")
-        ) {
-
-        return polkit.Result.YES;
-    }
-});
-'
+# variables
 
 SYSTEMD_DIR="/etc/systemd/system/getty@tty1.service.d/"
 SYSTEMD_FILE="/etc/systemd/system/getty@tty1.service.d/override.conf"
@@ -95,6 +84,7 @@ sudo pacman -Syu
 
 export RUSTUP_HOME="$HOME/.local/share/rustup/"
 export CARGO_HOME="$HOME/.local/share/cargo/"
+export PATH="${HOME}/.local/bin/:${PATH}"
 
 # base
 
@@ -115,7 +105,7 @@ fi
 
 # git
 
-if prompt "Do you want to configure your Git settings?"; then
+if prompt "Configure your Git settings?${NEW_LINE}Not needed if this data is synced via backups."; then
     ask "username" "What is your Git username?"
     git config --global user.name "$username"
     msg "Username set as ${username}"
@@ -127,14 +117,14 @@ fi
 
 # shell
 
-if prompt "Do you want to install shell programs?"; then
-    if prompt "Do you want to install dash as the default shell for running scripts?"; then
+if prompt "Install shell programs?"; then
+    if prompt "Install dash as default shell for scripts?"; then
         sudo pacman -S --needed dash
         sudo rm -f /bin/sh
         sudo ln -sf /bin/dash /bin/sh
     fi
 
-    if prompt "Do you want to install fish as the interative shell?"; then
+    if prompt "Install fish as the interative shell?"; then
         sudo pacman -S --needed fish
         command -v fish | sudo tee -a /etc/shells > /dev/null 2>&1
         chsh -s "$(command -v fish)"
@@ -143,7 +133,7 @@ fi
 
 # security
 
-if prompt "Do you want to enable sane security defaults?"; then
+if prompt "Enable sane security defaults?"; then
     sudo pacman -S --needed ufw
     sudo ufw default deny incoming
     sudo systemctl enable --now ufw
@@ -152,11 +142,11 @@ fi
 
 # local files
 
-if prompt "Do you enable local data syncing?"; then
+if prompt "Local data syncing from thumb drive?"; then
 
     # copy home files from local env files
 
-    if prompt "Do you want to install custom configuration and scripts?"; then
+    if prompt "Install public configuration and scripts?"; then
         sudo rsync $RSYNC_ARGS "${ENV}/public/etc" "/"
         rsync $RSYNC_ARGS "${ENV}/public/.config" "$HOME"
         rsync $RSYNC_ARGS "${ENV}/public/.local/bin" "$HOME/.local/"
@@ -166,7 +156,7 @@ if prompt "Do you enable local data syncing?"; then
 
     # copy user files locally
  
-    if prompt "Do you want to sync large/private documents, photos, and music from the USB ${USB}?"; then
+    if prompt "Sync large/private documents, photos, and music from the USB ${USB}?"; then
         if ! grep "$USB" /etc/fstab > /dev/null 2>&1; then
             echo "$USB_FSTAB_ENTRY" | sudo tee -a /etc/fstab > /dev/null 2>&1
         fi
@@ -184,6 +174,7 @@ if prompt "Do you enable local data syncing?"; then
             rsync $RSYNC_ARGS "${USB_MOUNT_DIR}/private/.librewolf" "$HOME/"
             rsync $RSYNC_ARGS "${USB_MOUNT_DIR}/private/.ssh" "$HOME/"
             rsync $RSYNC_ARGS "${USB_MOUNT_DIR}/private/.config/gnupg" "$HOME/.config/"
+            rsync $RSYNC_ARGS "${USB_MOUNT_DIR}/private/.config/git" "$HOME/.config/"
             rsync $RSYNC_ARGS "${USB_MOUNT_DIR}/private/.local/share/gurk" "$HOME/.local/share"
 
             chmod -R 755 "${HOME}/Documents/"
@@ -216,7 +207,7 @@ fi
 
 # utilities
 
-if prompt "Do you want to install utilities like bluetooth, brightness control, printing, and battery management?"; then
+if prompt "Install bluetooth, brightness control, printing, and battery management?"; then
 
     # dashi for utility control
 
@@ -251,7 +242,7 @@ fi
 
 # developer dependencies & utilities
 
-if prompt "Do you want to install developer utilities, programs, and libraries?"; then
+if prompt "Install developer utilities, editors, and libraries?"; then
     if prompt "Do you want to install rust components and programs?"; then
         paru -S --needed rust-analyzer cmake lldb sccache
         rustup default stable
@@ -279,7 +270,7 @@ fi
  
 # core apps
 
-if prompt "Do you want to install user applications?"; then
+if prompt "Install user applications?"; then
     paru -S --needed $PKG_THEME $PKG_CLI_EXTRA $PKG_GUI
 
     if ! systemd_running NetworkManager.service; then
@@ -329,11 +320,11 @@ if prompt "Do you want to install user applications?"; then
     fi
 fi
 
-if prompt "Installation complete. Would you like to clean up pre-installed files and programs?"; then
+if prompt "Installation complete. Clean up pre-installed files and programs?"; then
 	./clean.sh
 fi
 
-if prompt "Would you like to enable auto start with swaylock enabled?${NEW_LINE}This will automatically logout of any graphical environment"; then
+if prompt "Enable auto start with swaylock enabled?${NEW_LINE}This will automatically logout of any graphical environment"; then
     if [ ! -f $SYSTEMD_FILE ]; then
         sudo mkdir -p "$SYSTEMD_DIR"
         sudo touch "$SYSTEMD_FILE"
