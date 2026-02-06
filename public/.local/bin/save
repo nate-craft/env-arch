@@ -39,6 +39,7 @@ rsync -a --mkpath --ignore-missing-args "${HOME}/.local/bin" "$ENV_LOCAL" || pan
 
 conf_to_env "mimeapps.list"
 conf_to_env "electron-flags.conf"
+conf_to_env "git"
 conf_to_env "tmux"
 conf_to_env "helix"
 conf_to_env "foot"
