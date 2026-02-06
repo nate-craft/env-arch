@@ -2,22 +2,22 @@
 
 ## Explanation
 
-This program is designed to take my personal environment from a remote repository or a local
-USB drive and install upon a **minimal** Arch Linux installation. This can then be backed up
-later to these same mediums with scripts in said environment. Because documents and music
-take up much disk space, they are only assumed to be accessible from a local USB drive.
-Details can be found in the `install.sh` script.
+Minimal Sway Arch Linux installation.  
+Public configuration and scripts in `/public/` available on git.
+Private configuration, data, and large file private USB backup.
+
+Details on installation available in `install.sh`.
+Quick installation via curl in `quick.sh`.
 
 ## Usage
 
-1. Install **minimal** Arch Linux from USB with the `archinstall` script.  
-  1A. Access wifi before with: `iwctl station wlan0 connect <network_name>` or with the install script.  
-  1B. Make sure to select `NetworkManager` as wifi for new system.  
-  1C. Ensure `git` is an added software package.  
-2. Reboot into system drive.  
-3. Login to wifi with `nmtui`.  
-4. (Optional) Plugin in USB drive containing large/private files.  
-5. `curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/nate-craft/env-arch/refs/heads/main/quick.sh | sh`  
+1. Connect to WiFi: `iwctl station wlan0 connect <network_name>`.  
+2. Install **minimal** Arch Linux with the `archinstall` script.  
+  2A. Select `NetworkManager` as wifi for new system.  
+3. Reboot.  
+4. Connect to WiFi: `nmtui`.  
+5. (Optional) Connect to USB drive containing large/private files.  
+6. `curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/nate-craft/env-arch/refs/heads/main/quick.sh | sh`  
 
 ## Keymap
 
