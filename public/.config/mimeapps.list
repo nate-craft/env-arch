@@ -1,5 +1,10 @@
 [Default Applications]
 application/pdf=org.pwmt.zathura.desktop
+application/lrf=calibre-lrfviewer.desktop
+application/docx=libreoffice-writer.desktop
+application/doc=libreoffice-writer.desktop
+application/odt=libreoffice-writer.desktop
+application/octet-stream=helix.desktop
 image/png=imv.desktop
 image/jpeg=imv.desktop
 image/gif=imv.desktop
@@ -8,5 +13,4 @@ image/webp=imv.desktop
 image/tiff=imv.desktop
 image/bmp=imv.desktop
 image/x-icon=imv.desktop
-application/lrf=calibre-lrfviewer.desktop
 x-scheme-handler/freetube=freetube.desktop
